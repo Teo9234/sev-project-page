@@ -1,10 +1,14 @@
+import Layout from "./components/layout/Layout.tsx";
 function App() {
 
-return (
-    <>
 
-    </>
-  )
+    return (
+        <>
+            <Layout >
+
+            </Layout>
+        </>
+    )
 }
 
 export default App
