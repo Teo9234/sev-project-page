@@ -1,2 +1,8 @@
 @import "tailwindcss";
 
+@theme {
+    --color-pt-light-red: #ff3030 !important;
+    --color-pt-light-green: #107322 !important;
+    --color-pt-dark-brown: #b17312 !important;
+    --color-pt-white: #d6d5d5 !important;
+}
