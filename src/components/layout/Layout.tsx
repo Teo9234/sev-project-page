@@ -1,5 +1,6 @@
 import Header from "./Header.tsx";
 import Footer from "./Footer.tsx";
+import * as React from "react";
 
 interface LayoutProps{
     children: React.ReactNode
