@@ -1,4 +1,4 @@
-import {Link} from "react-router";
+import {NavLink} from "react-router";
 
 const HomePage = () => {
 
@@ -11,13 +11,13 @@ const HomePage = () => {
             <h1 className="text-center text-bold text-2xl my-12">Home Page</h1>
             <div className="flex-row items-center max-w-xl mx-auto gap-4">
                 {links.map((link) => (
-                    <Link
+                    <NavLink
                         key={link.path}
                         to={link.path}
                         className="text-center text-bold text-xl my-12 bg-pt-dark-brown text-white"
                     >
                         {link.label}
-                    </Link>
+                    </NavLink>
                 ))}
             </div>
 
