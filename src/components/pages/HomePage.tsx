@@ -7,7 +7,7 @@ const HomePage = () => {
         {path: "/users/:userId", label: "Users Page"},
         {path: "/search", label: "Search Page"},
         {path: "/clock", label: "Clock in Page"},
-        {path: "MultiField Form", label: "MultiField Form"},
+        {path: "/form", label: "MultiField Form"},
     ];
 
     return (

@@ -5,7 +5,7 @@ import UserPage from "./components/pages/UserPage.tsx";
 import SearchPage from "./components/pages/SearchPage.tsx";
 import PageNotFound from "./components/pages/PageNotFound.tsx";
 import RouterLayout from "./components/layout/RouterLayout.tsx";
-import MultiFieldFormWithValidation from "./components/MultiFieldFormWithValidation.tsx";
+import MultiFieldFormWithValidation from "./components/pages/MultiFieldFormWithValidation.tsx";
 import ClockInPage from "./components/pages/ClockInPage.tsx";
 function App() {
 
@@ -25,8 +25,9 @@ function App() {
                         <Route path="/clock" element={<ClockInPage />} />
                         <Route path="/MultiField Form" element={<MultiFieldFormWithValidation />} />
 
+
+                        <Route path="*" element={<PageNotFound />} />
                     </Route>
-                    <Route path="*" element={<PageNotFound />} />
                 </Routes>
             </BrowserRouter>
         </>
