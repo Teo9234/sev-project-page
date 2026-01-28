@@ -3,7 +3,7 @@ const Button = () => {
     return (
         <>
             <button
-                className={'bg-pt-light-brown opacity-90 hover:opacity-100 text-white px-4 py-3 rounded-2xl hover:cursor-pointer hover:bg-pt-dark-brown'} // + add
+                className={'bg-ci-dark-brown opacity-90 hover:opacity-100 text-shadow-blue-500 px-4 py-3 rounded-2xl hover:cursor-pointer hover:bg-ci-green'} // + add
                 // onClick={}
             >
                 Order

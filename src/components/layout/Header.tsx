@@ -1,11 +1,53 @@
+import { NavLink } from "react-router-dom";
+import { FaHome, FaSearch, FaUser } from "react-icons/fa";
+
 const Header = () => {
     return (
-        <header style={{ textAlign: 'center', padding: '1rem', backgroundColor: 'darkslateblue' }}>
-            <div className="flex flex-row items-center max-w-xl mx-auto gap-x-8">
-                <h1>Clock in</h1>
-            </div>
+        <header className="flex items-center justify-between px-6 py-4 bg-gray-900 text-white">
+            <h1 className="text-lg font-bold">Clock App</h1>
+
+            <nav className="flex gap-6">
+                {/* Home */}
+                <NavLink
+                    to="/"
+                    aria-label="Home"
+                    className={({ isActive }) =>
+                        `text-2xl p-2 rounded hover:bg-gray-700 transition ${
+                            isActive ? "text-green-400" : "text-white"
+                        }`
+                    }
+                >
+                    <FaHome />
+                </NavLink>
+
+                {/* Search (future backend queries) */}
+                <NavLink
+                    to="/search"
+                    aria-label="Search"
+                    className={({ isActive }) =>
+                        `text-2xl p-2 rounded hover:bg-gray-700 transition ${
+                            isActive ? "text-green-400" : "text-white"
+                        }`
+                    }
+                >
+                    <FaSearch />
+                </NavLink>
+
+                {/* User */}
+                <NavLink
+                    to="/users/:userId"
+                    aria-label="User Profile"
+                    className={({ isActive }) =>
+                        `text-2xl p-2 rounded hover:bg-gray-700 transition ${
+                            isActive ? "text-green-400" : "text-white"
+                        }`
+                    }
+                >
+                    <FaUser />
+                </NavLink>
+            </nav>
         </header>
     );
-}
+};
 
 export default Header;
