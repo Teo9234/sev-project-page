@@ -22,7 +22,7 @@ const Header = () => {
 
                 {/* Search (future backend queries) */}
                 <NavLink
-                    to="/search"
+                    to="/employees"
                     aria-label="Search"
                     className={({ isActive }) =>
                         `text-2xl p-2 rounded hover:bg-gray-700 transition ${
@@ -35,7 +35,7 @@ const Header = () => {
 
                 {/* User */}
                 <NavLink
-                    to="/users/:userId"
+                    to="/profile"
                     aria-label="User Profile"
                     className={({ isActive }) =>
                         `text-2xl p-2 rounded hover:bg-gray-700 transition ${

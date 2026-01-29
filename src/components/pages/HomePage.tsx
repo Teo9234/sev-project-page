@@ -4,16 +4,17 @@ const HomePage = () => {
 
     const links = [
         {path: "/", label: "Home Page"},
-        {path: "/users/:userId", label: "Users Page"},
         {path: "/search", label: "Search Page"},
         {path: "/clock", label: "Clock in Page"},
         {path: "/form", label: "MultiField Form"},
+        {path: "/employees", label: "Employee List"},
+        {path: "/profile", label: "User Profile"},
     ];
 
     return (
         <>
             <h1 className="text-center text-bold text-2xl my-12">Home Page</h1>
-            <div className="flex flex-row items-center max-w-xl mx-auto gap-x-8">
+            <div className="flex flex-row items-center max-w-xl mx-auto gap-x-6">
             {links.map((link) => (
                     <NavLink
                         key={link.path}
