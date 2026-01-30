@@ -17,6 +17,12 @@ export function EmployeeUserProfile({ user }: UserProfileProps) {
         // TODO: call your updateEmployee function
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem("currentUser");
+        window.location.href = "/login"; // or navigate()
+        // TODO: call your logout function
+    };
+
     const isClockedIn = !!user.clock_in;
 
     return (
@@ -43,7 +49,13 @@ export function EmployeeUserProfile({ user }: UserProfileProps) {
             </CardContent>
 
             <CardFooter>
-                <Button onClick={handleSave}>Save Changes</Button>
+                <Button variant="outline" onClick={handleLogout}>
+                    Logout
+                </Button>
+
+                <Button onClick={handleSave}>
+                    Save Changes
+                </Button>
             </CardFooter>
         </Card>
     );

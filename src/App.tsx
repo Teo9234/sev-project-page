@@ -9,6 +9,7 @@ import ClockInPage from "./components/pages/ClockInPage.tsx";
 import EmployeeListPage from "@/components/pages/EmployeeListPage.tsx";
 import type {Employee} from "@/schemas/employees.ts";
 import EmployeeUserPage from "@/components/pages/EmployeeUserPage.tsx";
+import LoginPage from "@/components/pages/LoginPage.tsx";
 
 
 function App() {
@@ -41,10 +42,13 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route element={<RouterLayout />} >
+                        {/*Login page place for later*/}
                         <Route path="/" element={<HomePage />} />
+
+                        <Route path="/login" element={<LoginPage />} />
                         <Route path="/search" element={<SearchPage />} />
                         <Route path="/clock" element={<ClockInPage />} />
-                        <Route path="/MultiField Form" element={<MultiFieldFormWithValidation />} />
+                        <Route path="/form" element={<MultiFieldFormWithValidation />} />
                         <Route path={"/clock-in"} element={<ClockInPage />} />
                         <Route path={"/profile"} element={<EmployeeUserPage user={mockUser} />} />
                         <Route path={"/employees"}>
