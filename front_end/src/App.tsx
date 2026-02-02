@@ -6,10 +6,10 @@ import PageNotFound from "./components/pages/PageNotFound.tsx";
 import RouterLayout from "./components/layout/RouterLayout.tsx";
 import MultiFieldFormWithValidation from "./components/pages/MultiFieldFormWithValidation.tsx";
 import ClockInPage from "./components/pages/ClockInPage.tsx";
-import EmployeeListPage from "@/components/pages/EmployeeListPage.tsx";
-import type {Employee} from "@/schemas/employees.ts";
-import EmployeeUserPage from "@/components/pages/EmployeeUserPage.tsx";
-import LoginPage from "@/components/pages/LoginPage.tsx";
+import EmployeeListPage from "./components/pages/EmployeeListPage.tsx";
+import type {Employee} from "./schemas/employees.ts";
+import EmployeeUserPage from "./components/pages/EmployeeUserPage.tsx";
+import LoginPage from "./components/pages/LoginPage.tsx";
 
 
 function App() {

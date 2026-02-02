@@ -9,7 +9,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table.tsx"
 import {useNavigate} from "react-router";
 import {Button} from "@/components/ui/button.tsx";
 import {Pencil, Trash2} from "lucide-react";
