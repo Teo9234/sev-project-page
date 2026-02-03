@@ -20,13 +20,14 @@ public class ClockEntry extends AbstractEntity {
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private LocalDateTime clockInTime;
 
     @Column
     private LocalDateTime clockOutTime;
 
-    @Column
-    private LocalDateTime lastModified;
-
+    // Optional: helper method to check if this entry is active
+    public boolean isActive() {
+        return clockOutTime == null;
+    }
 }
