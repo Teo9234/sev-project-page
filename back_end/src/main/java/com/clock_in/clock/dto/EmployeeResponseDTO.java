@@ -1,4 +1,4 @@
-package com.clock_in.dto;
+package com.clock_in.clock.dto;
 
 import com.clock_in.core.enums.Role;
 import lombok.Getter;

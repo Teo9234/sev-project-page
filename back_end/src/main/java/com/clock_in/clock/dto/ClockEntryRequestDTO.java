@@ -1,4 +1,4 @@
-package com.clock_in.dto;
+package com.clock_in.clock.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

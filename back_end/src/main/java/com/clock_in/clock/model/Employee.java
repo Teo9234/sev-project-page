@@ -1,4 +1,4 @@
-package com.clock_in.model;
+package com.clock_in.clock.model;
 
 import com.clock_in.core.enums.Role;
 import jakarta.persistence.*;

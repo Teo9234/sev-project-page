@@ -1,6 +1,6 @@
-package com.clock_in.repository;
+package com.clock_in.clock.repository;
 
-import com.clock_in.model.Employee;
+import com.clock_in.clock.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;

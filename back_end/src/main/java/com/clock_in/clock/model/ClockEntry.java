@@ -1,4 +1,4 @@
-package com.clock_in.model;
+package com.clock_in.clock.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,5 +29,9 @@ public class ClockEntry extends AbstractEntity {
     // Optional: helper method to check if this entry is active
     public boolean isActive() {
         return clockOutTime == null;
+    }
+
+    public LocalDateTime getLastModified() {
+        return null;
     }
 }
