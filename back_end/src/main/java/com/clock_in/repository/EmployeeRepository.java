@@ -22,4 +22,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>,
 
         // Find employee by office
         Optional<Employee> findByOffice(String office);
+
+        // Find employee by isCurrentlyWorking status
+        Optional<Employee> findByClockEntries_ClockOutTimeIsNull();
     }
