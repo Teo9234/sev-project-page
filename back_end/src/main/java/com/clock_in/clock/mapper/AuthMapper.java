@@ -3,6 +3,7 @@ package com.clock_in.clock.mapper;
 import com.clock_in.clock.dto.auth.RegisterRequestDTO;
 import com.clock_in.clock.dto.auth.RegisterResponseDTO;
 import com.clock_in.clock.model.Employee;
+import com.clock_in.core.enums.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class AuthMapper {
@@ -13,7 +14,7 @@ public class AuthMapper {
         employee.setFullName(dto.getFullName());
         employee.setEmail(dto.getEmail());
         employee.setPasswordHash(passwordEncoder.encode(dto.getPassword())); // hash password
-        employee.setRole(dto.getRole().name()); // store enum as string
+        employee.setRole(Role.valueOf(dto.getRole().name())); // store enum as string
         employee.setOffice(dto.getOffice());
         employee.setOnLeave(dto.isOnLeave());
         return employee;
