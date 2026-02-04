@@ -1,4 +1,4 @@
-package com.clock_in.clock.model;
+package com.clock_in.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

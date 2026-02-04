@@ -1,6 +1,6 @@
 package com.clock_in.repository;
 
-import com.clock_in.clock.model.Employee;
+import com.clock_in.model.Employee;
 import com.clock_in.core.enums.Role;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
