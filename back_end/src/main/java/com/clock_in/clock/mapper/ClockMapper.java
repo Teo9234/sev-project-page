@@ -49,7 +49,8 @@ public class ClockMapper {
         dto.setClockInTime(toEpochMilli(entry.getClockInTime()));
         dto.setClockOutTime(entry.getClockOutTime() != null ? toEpochMilli(entry.getClockOutTime()) : null);
 
-        dto.setLastModified(entry.getLastModified());
+        // Set lastModified as epoch milli or null if not set
+        dto.setLastModified(entry.getLastModified() != null ? toEpochMilli(entry.getLastModified()) : null);
         dto.setCurrentlyWorking(entry.getClockOutTime() == null);
 
         return dto;

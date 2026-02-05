@@ -11,26 +11,26 @@ import java.util.UUID;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long>,
-    JpaSpecificationExecutor<Employee> {
+        JpaSpecificationExecutor<Employee> {
 
-        // Find employee by email
-        Optional<Employee> findByEmail(String email);
+    // Find by email (used for login, validation)
+    Optional<Employee> findByEmail(String email);
 
-        // Find employee by full name
-        Optional<Employee> findByFullName(String fullName);
+    // Find by full name (used for search, admin functions)
+    Optional<Employee> findByFullName(String fullName);
 
-        // Lists employee by leave status
-        List<Employee> findByIsOnLeave(boolean isOnLeave);
+    // Find all employees currently on leave (HR, admin use)
+    List<Employee> findByIsOnLeave(boolean isOnLeave);
 
-        // Lists employee by office
-        List<Employee> findByOffice(String office);
+    // Find all employees in a specific office (admin use, reporting)
+    List<Employee> findByOffice(String office);
 
-        // Lists employee by isCurrentlyWorking status
-        List<Employee> findByClockEntries_ClockOutTimeIsNull();
+    // Find all employees currently working (clocked in but not out)
+    List<Employee> findByClockEntries_ClockOutTimeIsNull();
 
-        // Find employee by uuid (if you have a UUID field in Employee, which is common for external references)
-        Optional<Employee> findByUuid(UUID uuid);
+    // Find by UUID (used for API endpoints, internal logic)
+    Optional<Employee> findByUuid(UUID uuid);
 
-        boolean existsByEmail(String email);
-
+    // Fast existence check by email (used for validation before create/update)
+    boolean existsByEmail(String email);
 }

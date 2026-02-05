@@ -8,26 +8,26 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface ClockEntryRepository
-        extends JpaRepository<ClockEntry, Long> {
+public interface ClockEntryRepository extends JpaRepository<ClockEntry, Long> {
 
-    // All entries for an employee (history, reports, etc.)
+    // Find all clock entries for a specific employee (used for history, reporting)
     List<ClockEntry> findByEmployee(Employee employee);
 
-    // All currently active clock entries (admin use, monitoring)
+    // Find all active clock entries (clocked in but not out) (used for dashboard, admin view)
     List<ClockEntry> findByClockOutTimeIsNull();
 
-    // Active entry for an employee (should be at most one)
+    // Find the most recent active clock entry for a specific employee (used for dashboard, validation)
     Optional<ClockEntry> findFirstByEmployeeAndClockOutTimeIsNull(Employee employee);
 
-    // All entries within a date range (reporting, analytics)
+    // Find all clock entries within a specific time range (used for reporting, admin functions)
     List<ClockEntry> findByClockInTimeBetween(LocalDateTime start, LocalDateTime end);
 
-    // find by uuid
-    Optional<ClockEntry> findByUuid(String uuid);
+    // Find by UUID (used for API endpoints, internal logic)
+    Optional<ClockEntry> findByUuid(UUID uuid);
 
-    // Fast existence check (used for validation)
+    // Fast existence check for active clock entry by employee (used for validation before clock in)
     boolean existsByEmployeeAndClockOutTimeIsNull(Employee employee);
 }

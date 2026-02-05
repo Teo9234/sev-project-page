@@ -26,7 +26,7 @@ public class AuthMapper {
         dto.setUuid(employee.getUuid().toString());
         dto.setFullName(employee.getFullName());
         dto.setEmail(employee.getEmail());
-        dto.setRole(employee.getRoleEnum()); // assume Employee has a helper getter for Role enum
+        dto.setRole(employee.getRole()); // use getRole to return enum value
         dto.setOffice(employee.getOffice());
         dto.setOnLeave(employee.isOnLeave());
         return dto;
