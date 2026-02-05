@@ -3,6 +3,7 @@ package com.clock_in.clock.controller;
 import com.clock_in.clock.dto.EmployeeRequestDTO;
 import com.clock_in.clock.dto.EmployeeResponseDTO;
 import com.clock_in.clock.service.EmployeeService;
+import com.clock_in.clock.validator.ValidUUID;
 import com.clock_in.core.exceptions.EmailAlreadyExists;
 import com.clock_in.core.exceptions.EmployeeNotFoundException;
 import jakarta.validation.Valid;
@@ -36,7 +37,7 @@ public class EmployeeController {
     // GET /api/employees/{uuid}
     // ----------------------------
     @GetMapping("/{uuid}")
-    public EmployeeResponseDTO getEmployee(@PathVariable String uuid) {
+    public EmployeeResponseDTO getEmployee(@ValidUUID @PathVariable String uuid) {
         return employeeService.getEmployee(uuid);
     }
 
@@ -55,7 +56,7 @@ public class EmployeeController {
     // ----------------------------
     @PutMapping("/{uuid}")
     public EmployeeResponseDTO updateEmployee(
-            @PathVariable String uuid,
+            @ValidUUID @PathVariable String uuid,
             @Valid @RequestBody EmployeeRequestDTO request
     ) throws EmployeeNotFoundException {
         return employeeService.updateEmployee(uuid, request);
