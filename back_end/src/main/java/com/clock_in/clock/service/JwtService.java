@@ -1,87 +1,53 @@
 package com.clock_in.clock.service;
 
 import com.clock_in.clock.model.Employee;
+import com.clock_in.clock.repository.EmployeeRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
 public class JwtService {
 
-    private SecretKey secretKey;
+    private final String secret = System.getenv("JWT_SECRET_KEY");
+    private final long expirationMillis = 86400000; // 24 hours in milliseconds
+    private final EmployeeRepository employeeRepository;
 
-    @Value("${jwt.secret}")
-    private String secret; // from application.properties
-
-    @Value("${jwt.expiration}")
-    private long expirationMillis; // e.g., 86400000 for 24h
-
-    @PostConstruct
-    public void init() {
-        // Initialize the SecretKey after Spring injects the secret
-        secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    public JwtService(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
 
-    // -----------------------------
-    // Generate JWT token for Employee
-    // -----------------------------
     public String generateToken(Employee employee) {
+        Claims claims = Jwts.claims().setSubject(employee.getEmail());
+        claims.put("role", employee.getRole().name());
+
         return Jwts.builder()
-                .setSubject(employee.getUuid().toString())
-                .claim("email", employee.getEmail())
-                .claim("role", employee.getRole().name())
+                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
 
-    // -----------------------------
-    // Extract all claims
-    // -----------------------------
-    public Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    public boolean isTokenValid(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    // -----------------------------
-    // Validate token
-    // -----------------------------
-    public boolean isTokenValid(String token, Employee employee) {
-        final String uuid = extractAllClaims(token).getSubject();
-        return uuid.equals(employee.getUuid().toString()) && !isTokenExpired(token);
-    }
-
-    // -----------------------------
-    // Check expiration
-    // -----------------------------
-    public boolean isTokenExpired(String token) {
-        final Date expiration = extractAllClaims(token).getExpiration();
-        return expiration.before(new Date());
-    }
-
-    // -----------------------------
-    // Extract email from token
-    // -----------------------------
     public String extractEmail(String token) {
-        return extractAllClaims(token).get("email", String.class);
+        Claims claims = Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).getBody();
+        return claims.getSubject(); // Extracts the email from the token
     }
 
-    // -----------------------------
-    // Extract role from token
-    // -----------------------------
-    public String extractRole(String token) {
-        return extractAllClaims(token).get("role", String.class);
+    public Employee getEmployeeFromToken(String token) {
+        String email = extractEmail(token);
+        return employeeRepository.findByEmail(email).orElse(null); // Fetch employee from DB
     }
 }

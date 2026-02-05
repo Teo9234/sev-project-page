@@ -8,6 +8,7 @@ import com.clock_in.clock.mapper.AuthMapper;
 import com.clock_in.clock.model.Employee;
 import com.clock_in.clock.repository.EmployeeRepository;
 import com.clock_in.core.exceptions.AppGenericException;
+import com.clock_in.core.exceptions.EmailAlreadyExists;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +32,10 @@ public class AuthService {
     // -----------------------------
     public RegisterResponseDTO register(RegisterRequestDTO request) throws AppGenericException {
         if (employeeRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new AppGenericException("Email already in use", "EMAIL_DUPLICATE");
+            throw new EmailAlreadyExists();
         }
+
+
 
         Employee employee = AuthMapper.toEmployeeEntity(request, passwordEncoder);
         employeeRepository.save(employee);
