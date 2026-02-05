@@ -19,4 +19,5 @@ public class ClockEntryRequestDTO {
 
     @Positive(message = "Clock-out time must be a positive Unix timestamp")
     private Long clockOutTime; // optional for clock-out
+
 }

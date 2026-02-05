@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -26,12 +27,13 @@ public class ClockEntry extends AbstractEntity {
     @Column
     private LocalDateTime clockOutTime;
 
+    @Column
+    @LastModifiedDate
+    private LocalDateTime lastModified;
+
     // Optional: helper method to check if this entry is active
     public boolean isActive() {
         return clockOutTime == null;
     }
 
-    public LocalDateTime getLastModified() {
-        return null;
-    }
 }

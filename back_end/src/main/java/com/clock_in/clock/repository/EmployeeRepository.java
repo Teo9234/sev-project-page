@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long>,
@@ -17,12 +19,18 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>,
         // Find employee by full name
         Optional<Employee> findByFullName(String fullName);
 
-        // Find employee by leave status
-        Optional<Employee> findByIsOnLeave(boolean isOnLeave);
+        // Lists employee by leave status
+        List<Employee> findByIsOnLeave(boolean isOnLeave);
 
-        // Find employee by office
-        Optional<Employee> findByOffice(String office);
+        // Lists employee by office
+        List<Employee> findByOffice(String office);
 
-        // Find employee by isCurrentlyWorking status
-        Optional<Employee> findByClockEntries_ClockOutTimeIsNull();
-    }
+        // Lists employee by isCurrentlyWorking status
+        List<Employee> findByClockEntries_ClockOutTimeIsNull();
+
+        // Find employee by uuid (if you have a UUID field in Employee, which is common for external references)
+        Optional<Employee> findByUuid(UUID uuid);
+
+        boolean existsByEmail(String email);
+
+}

@@ -30,6 +30,14 @@ public abstract class AbstractEntity {
     private LocalDateTime createdAt;
 
     @PrePersist
+    protected void onCreate() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID();
+        }
+        createdAt = LocalDateTime.now();
+    }
+
+    @PrePersist
     protected void initUUID() {
         if (uuid == null) {
             uuid = UUID.randomUUID();

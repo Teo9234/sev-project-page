@@ -52,7 +52,4 @@ public class Employee extends AbstractEntity {
         return clockEntries.stream().anyMatch(ClockEntry::isActive);
     }
 
-    public Role getRoleEnum() {
-        return Role.valueOf(String.valueOf(this.role)); // converts the String back to the Role enum
-    }
 }

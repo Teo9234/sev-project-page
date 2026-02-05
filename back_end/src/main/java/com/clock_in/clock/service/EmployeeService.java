@@ -2,73 +2,109 @@ package com.clock_in.clock.service;
 
 import com.clock_in.clock.model.Employee;
 import com.clock_in.clock.repository.EmployeeRepository;
-import com.clock_in.clock.specification.EmployeeSpecification;
-import com.clock_in.core.exceptions.AppGenericException;
-import com.clock_in.core.exceptions.ValidationException;
-import org.springframework.data.jpa.domain.Specification;
+import com.clock_in.clock.dto.EmployeeRequestDTO;
+import com.clock_in.clock.dto.EmployeeResponseDTO;
+import com.clock_in.core.exceptions.EmailAlreadyExists;
+import com.clock_in.core.exceptions.EmployeeNotFoundException;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import java.util.EmptyStackException;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
 
+    // Constructor injection of the repository
     public EmployeeService(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
-    // -----------------------------
-    // Dynamic search using specifications
-    // -----------------------------
-    public List<Employee> searchEmployees(
-            Optional<String> email,
-            Optional<String> fullName,
-            Optional<String> office,
-            Optional<Boolean> isOnLeave
-    ) throws ValidationException {
+    // ----------------------------
+    // Get employee by UUID (internal use)
+    // ----------------------------
+    public Employee getEmployeeByUuid(UUID uuid) throws EmployeeNotFoundException {
+        return employeeRepository.findByUuid(uuid)
+                .orElseThrow(EmployeeNotFoundException::new);
+    }
 
-        Specification<Employee> spec = buildSpecification(email, fullName, office, isOnLeave);
+    // ----------------------------
+    // Create a new employee
+    // ----------------------------
+    @Transactional
+    public EmployeeResponseDTO createEmployee(EmployeeRequestDTO request) throws EmailAlreadyExists {
 
-        List<Employee> results = employeeRepository.findAll(spec);
-
-        if (results.isEmpty()) {
-            throw new ValidationException("No employees found with the given criteria", "EMP_NOT_FOUND");
+        // Validate unique email
+        if (employeeRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExists();
         }
 
-        return results;
+        Employee employee = new Employee();
+        employee.setFullName(request.getFullName());
+        employee.setEmail(request.getEmail());
+        // In production, hash the password properly
+        employee.setPasswordHash(request.getPassword());
+        employee.setOffice(request.getOffice());
+        employee.setRole(request.getRole());
+        employee.setOnLeave(request.isOnLeave());
+
+        employeeRepository.save(employee);
+
+        return EmployeeResponseDTO.fromEntity(employee);
     }
 
-    // -----------------------------
-    // Find by email
-    // -----------------------------
-    public Employee getByEmail(String email) throws AppGenericException {
-        return employeeRepository.findByEmail(email)
-                .orElseThrow(() -> new AppGenericException("Employee not found", "EMP_NOT_FOUND"));
+    // ----------------------------
+    // Get a single employee by UUID
+    // ----------------------------
+    public EmployeeResponseDTO getEmployee(String uuid) {
+        Employee employee = employeeRepository.findByUuid(UUID.fromString(uuid))
+                .orElseThrow(EmptyStackException::new);
+        return EmployeeResponseDTO.fromEntity(employee);
     }
 
-    // -----------------------------
-    // Helper method to build specifications
-    // -----------------------------
-    private Specification<Employee> buildSpecification(
-            Optional<String> email,
-            Optional<String> fullName,
-            Optional<String> office,
-            Optional<Boolean> isOnLeave
-    ) {
-        Specification<Employee> spec = null;
-
-        if (email.isPresent()) spec = addSpec(spec, EmployeeSpecification.hasEmail(email.get()));
-        if (fullName.isPresent()) spec = addSpec(spec, EmployeeSpecification.hasFullName(fullName.get()));
-        if (office.isPresent()) spec = addSpec(spec, EmployeeSpecification.hasOffice(office.get()));
-        if (isOnLeave.isPresent()) spec = addSpec(spec, EmployeeSpecification.isOnLeave(isOnLeave.get()));
-
-        return spec;
+    // ----------------------------
+    // List all employees
+    // ----------------------------
+    public List<EmployeeResponseDTO> listEmployees() {
+        return employeeRepository.findAll()
+                .stream()
+                .map(EmployeeResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
-    private Specification<Employee> addSpec(Specification<Employee> base, Specification<Employee> next) {
-        return (base == null) ? next : base.and(next);
+    // ----------------------------
+    // Update employee info
+    // ----------------------------
+    @Transactional
+    public EmployeeResponseDTO updateEmployee(String uuid, EmployeeRequestDTO request) throws EmployeeNotFoundException {
+        Employee employee = employeeRepository.findByUuid(UUID.fromString(uuid))
+                .orElseThrow(EmployeeNotFoundException::new);
+
+        employee.setFullName(request.getFullName());
+        employee.setEmail(request.getEmail());
+        // Only update password if provided
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            employee.setPasswordHash(request.getPassword());
+        }
+        employee.setOffice(request.getOffice());
+        employee.setRole(request.getRole());
+        employee.setOnLeave(request.isOnLeave());
+
+        employeeRepository.save(employee);
+
+        return EmployeeResponseDTO.fromEntity(employee);
+    }
+
+    // ----------------------------
+    // Optional: delete an employee
+    // ----------------------------
+    @Transactional
+    public void deleteEmployee(String uuid) throws EmployeeNotFoundException {
+        Employee employee = employeeRepository.findByUuid(UUID.fromString(uuid))
+                .orElseThrow(EmployeeNotFoundException::new);
+        employeeRepository.delete(employee);
     }
 }
