@@ -2,7 +2,6 @@ package com.clock_in.clock.validator;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import org.hibernate.validator.internal.constraintvalidators.hv.UUIDValidator;
 
 import java.lang.annotation.*;
 

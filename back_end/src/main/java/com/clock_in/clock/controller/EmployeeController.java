@@ -9,12 +9,14 @@ import com.clock_in.core.exceptions.EmailAlreadyExists;
 import com.clock_in.core.exceptions.EmployeeNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/employees")
+@Validated
 public class EmployeeController {
 
     private final EmployeeService employeeService;
