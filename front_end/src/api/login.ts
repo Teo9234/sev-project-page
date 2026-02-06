@@ -1,35 +1,84 @@
-import type {LoginFields} from "@/schemas/login.ts";
+import type { LoginFields, RegisterFields } from "@/schemas/login.ts";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = "http://localhost:8080/api";
 
 export type LoginResponse = {
-    access_token: string;
-    token_type: string;
+    token: string;
+    fullName: string;
+    email: string;
+    role: string;
+    office: string;
+    onLeave: boolean;
 };
-export async function login({ email, password }: LoginFields): Promise<LoginResponse> {
-    const form = new URLSearchParams();
-    form.append("email", email);
-    form.append("password", password);
 
-    const response = await fetch(`${API_URL}/auth/login`, {  // Adjust the endpoint as needed
+export type RegisterResponse = {
+    uuid: string;
+    fullName: string;
+    email: string;
+    role: string;
+    office: string;
+    onLeave: boolean;
+};
+
+export async function login({ email, password }: LoginFields): Promise<LoginResponse> {
+    const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/json"
         },
-        body: form.toString(),
+        body: JSON.stringify({ email, password })
     });
+
     if (!response.ok) {
         let detail = "Login failed";
         try {
             const data = await response.json();
-            if (typeof data?.detail === "string") {
+            if (typeof data?.message === "string") {
+                detail = data.message;
+            } else if (typeof data?.detail === "string") {
                 detail = data.detail;
             }
         } catch (error) {
-            console.log(error); // why not .error?
+            console.error(error);
         }
         throw new Error(detail);
     }
     return await response.json();
 }
 
+export async function register(fields: RegisterFields): Promise<RegisterResponse> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPassword, ...rest } = fields;
+    const body = {
+        fullName: rest.fullName,
+        email: rest.email,
+        password: rest.password,
+        role: rest.role,
+        office: rest.office ?? "",
+        isOnLeave: rest.isOnLeave
+    };
+
+    const response = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+        let detail = "Registration failed";
+        try {
+            const data = await response.json();
+            if (typeof data?.message === "string") {
+                detail = data.message;
+            } else if (typeof data?.detail === "string") {
+                detail = data.detail;
+            }
+        } catch (error) {
+            console.error(error);
+        }
+        throw new Error(detail);
+    }
+    return await response.json();
+}

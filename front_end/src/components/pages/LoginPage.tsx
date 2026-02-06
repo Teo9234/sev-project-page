@@ -1,50 +1,107 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router";
+import { login } from "@/api/login.ts";
+import { loginSchema, type LoginFields } from "@/schemas/login.ts";
+import { setCookie } from "@/utils/cookies.ts";
+import { Button } from "../ui/button.tsx";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card.tsx";
+import { Input } from "../ui/input.tsx";
+import { Label } from "../ui/label.tsx";
+
 const LoginPage = () => {
+    const [serverError, setServerError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors }
+    } = useForm<LoginFields>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: "",
+            password: ""
+        }
+    });
+
+    const onSubmit = async (data: LoginFields) => {
+        setServerError(null);
+        setIsLoading(true);
+        try {
+            const response = await login(data);
+            setCookie("token", response.token, { expires: 1, sameSite: "strict" });
+            setCookie("fullName", response.fullName, { expires: 1, sameSite: "strict" });
+            setCookie("email", response.email, { expires: 1, sameSite: "strict" });
+            setCookie("role", response.role, { expires: 1, sameSite: "strict" });
+            navigate("/");
+        } catch (error) {
+            if (error instanceof Error) {
+                setServerError(error.message);
+            } else {
+                setServerError("An unexpected error occurred");
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
-        <>
-        <form
-            className="max-w-md mx-auto my-12 p-6 border border-gray-300 rounded-lg shadow-md bg-white"
-        >
-            <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-            <div className="mb-4">
-                <label
-                    htmlFor="email"
-                    className="block text-gray-700 font-semibold mb-2"
-                >
-                    Email:
-                </label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your email"
-                />
-            </div>
-            <div className="mb-6">
-                <label
-                    htmlFor="password"
-                    className="block text-gray-700 font-semibold mb-2"
-                >
-                    Password:
-                </label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your password"
-                />
-            </div>
-            <button
-                type="submit"
-                className="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
-            >
-                Login
-            </button>
-        </form>
-        </>
-    )
-}
+        <div className="flex items-center justify-center min-h-[70vh]">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle className="text-2xl text-center">Login</CardTitle>
+                    <CardDescription className="text-center">Enter your credentials to access your account</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        {serverError && (
+                            <div className="rounded-md bg-destructive/10 border border-destructive/30 px-4 py-3 text-sm text-destructive">
+                                {serverError}
+                            </div>
+                        )}
+
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="you@example.com"
+                                {...register("email")}
+                                aria-invalid={!!errors.email}
+                            />
+                            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                placeholder="Enter your password"
+                                {...register("password")}
+                                aria-invalid={!!errors.password}
+                            />
+                            {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+                        </div>
+
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading ? "Logging in..." : "Login"}
+                        </Button>
+
+                        <p className="text-center text-sm text-muted-foreground">
+                            Don't have an account?{" "}
+                            <Link to="/register" className="text-primary underline hover:text-primary/80">
+                                Register
+                            </Link>
+                        </p>
+                    </form>
+                </CardContent>
+            </Card>
+        </div>
+    );
+};
 
 export default LoginPage;
