@@ -30,7 +30,7 @@ public class ClockMapper {
         Employee employee = new Employee();
         employee.setFullName(dto.getFullName());
         employee.setEmail(dto.getEmail());
-        employee.setPasswordHash(dto.getPassword()); // hash in service layer
+        employee.setPassword(dto.getPassword()); // hash in service layer
         employee.setRole(dto.getRole());
         employee.setOffice(dto.getOffice());
         employee.setOnLeave(dto.isOnLeave());

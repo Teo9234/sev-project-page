@@ -46,7 +46,7 @@ public class EmployeeService {
         }
 
         Employee employee = ClockMapper.toEmployeeEntity(request);
-        employee.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        employee.setPassword(passwordEncoder.encode(request.getPassword()));
 
         employeeRepository.save(employee);
         return EmployeeResponseDTO.fromEntity(employee);
@@ -80,7 +80,7 @@ public class EmployeeService {
         employee.setFullName(request.getFullName());
         employee.setEmail(request.getEmail());
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            employee.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+            employee.setPassword(passwordEncoder.encode(request.getPassword()));
         }
         employee.setOffice(request.getOffice());
         employee.setRole(request.getRole());

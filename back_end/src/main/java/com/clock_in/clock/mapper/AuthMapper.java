@@ -13,7 +13,7 @@ public class AuthMapper {
         Employee employee = new Employee();
         employee.setFullName(dto.getFullName());
         employee.setEmail(dto.getEmail());
-        employee.setPasswordHash(passwordEncoder.encode(dto.getPassword())); // hash password
+        employee.setPassword(passwordEncoder.encode(dto.getPassword())); // hash password
         employee.setRole(Role.valueOf(dto.getRole().name())); // store enum as string
         employee.setOffice(dto.getOffice());
         employee.setOnLeave(dto.isOnLeave());

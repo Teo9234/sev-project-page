@@ -9,6 +9,7 @@ import com.clock_in.clock.model.Employee;
 import com.clock_in.clock.repository.EmployeeRepository;
 import com.clock_in.core.exceptions.AppGenericException;
 import com.clock_in.core.exceptions.EmailAlreadyExists;
+import com.clock_in.core.exceptions.LoginFailed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +41,7 @@ public class AuthService {
         Employee employee = new Employee();
         employee.setFullName(request.getFullName());
         employee.setEmail(request.getEmail());
-        employee.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        employee.setPassword(passwordEncoder.encode(request.getPassword()));
         employee.setOffice(request.getOffice());
         employee.setRole(request.getRole());
         employee.setOnLeave(request.isOnLeave());
@@ -55,12 +56,14 @@ public class AuthService {
      * Login with email + password.
      * Returns LoginResponseDTO with JWT token.
      */
-    public LoginResponseDTO login(LoginRequestDTO request) throws AppGenericException {
+    public LoginResponseDTO login(LoginRequestDTO request) throws LoginFailed {
         Employee employee = employeeRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new AppGenericException("Invalid email or password", "LOGIN_FAILED"));
+                .orElseThrow(LoginFailed::new);
 
-        if (!passwordEncoder.matches(request.getPassword(), employee.getPasswordHash())) {
-            throw new AppGenericException("Invalid email or password", "LOGIN_FAILED");
+        System.out.println("HASH = " + employee.getPassword());
+        System.out.println("ENCODER = " + passwordEncoder.getClass());
+        if (!passwordEncoder.matches(request.getPassword(), employee.getPassword())) {
+            throw new LoginFailed();
         }
 
         String token = jwtService.generateToken(employee);
