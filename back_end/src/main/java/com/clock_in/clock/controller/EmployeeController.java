@@ -37,7 +37,7 @@ public class EmployeeController {
     // GET /api/employees/{uuid}
     // ----------------------------
     @GetMapping("/{uuid}")
-    public EmployeeResponseDTO getEmployee(@ValidUUID @PathVariable String uuid) {
+    public EmployeeResponseDTO getEmployee(@ValidUUID @PathVariable String uuid) throws EmployeeNotFoundException {
         return employeeService.getEmployee(uuid);
     }
 

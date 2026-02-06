@@ -1,14 +1,16 @@
 package com.clock_in.clock.service;
 
-import com.clock_in.clock.model.Employee;
-import com.clock_in.clock.repository.EmployeeRepository;
 import com.clock_in.clock.dto.EmployeeRequestDTO;
 import com.clock_in.clock.dto.EmployeeResponseDTO;
+import com.clock_in.clock.mapper.ClockMapper;
+import com.clock_in.clock.model.Employee;
+import com.clock_in.clock.repository.EmployeeRepository;
 import com.clock_in.core.exceptions.EmailAlreadyExists;
 import com.clock_in.core.exceptions.EmployeeNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.EmptyStackException;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,14 +19,16 @@ import java.util.stream.Collectors;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    // Constructor injection of the repository
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository,
+                           PasswordEncoder passwordEncoder) {
         this.employeeRepository = employeeRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // ----------------------------
-    // Get employee by UUID (internal use)
+    // Get employee by UUID
     // ----------------------------
     public Employee getEmployeeByUuid(UUID uuid) throws EmployeeNotFoundException {
         return employeeRepository.findByUuid(uuid)
@@ -32,36 +36,27 @@ public class EmployeeService {
     }
 
     // ----------------------------
-    // Create a new employee
+    // Create employee
     // ----------------------------
     @Transactional
     public EmployeeResponseDTO createEmployee(EmployeeRequestDTO request) throws EmailAlreadyExists {
 
-        // Validate unique email
         if (employeeRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExists();
         }
 
-        Employee employee = new Employee();
-        employee.setFullName(request.getFullName());
-        employee.setEmail(request.getEmail());
-        // In production, hash the password properly
-        employee.setPasswordHash(request.getPassword());
-        employee.setOffice(request.getOffice());
-        employee.setRole(request.getRole());
-        employee.setOnLeave(request.isOnLeave());
+        Employee employee = ClockMapper.toEmployeeEntity(request);
+        employee.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
         employeeRepository.save(employee);
-
         return EmployeeResponseDTO.fromEntity(employee);
     }
 
     // ----------------------------
-    // Get a single employee by UUID
+    // Get employee by UUID as DTO
     // ----------------------------
-    public EmployeeResponseDTO getEmployee(String uuid) {
-        Employee employee = employeeRepository.findByUuid(UUID.fromString(uuid))
-                .orElseThrow(EmptyStackException::new);
+    public EmployeeResponseDTO getEmployee(String uuid) throws EmployeeNotFoundException {
+        Employee employee = getEmployeeByUuid(UUID.fromString(uuid));
         return EmployeeResponseDTO.fromEntity(employee);
     }
 
@@ -76,35 +71,31 @@ public class EmployeeService {
     }
 
     // ----------------------------
-    // Update employee info
+    // Update employee
     // ----------------------------
     @Transactional
     public EmployeeResponseDTO updateEmployee(String uuid, EmployeeRequestDTO request) throws EmployeeNotFoundException {
-        Employee employee = employeeRepository.findByUuid(UUID.fromString(uuid))
-                .orElseThrow(EmployeeNotFoundException::new);
+        Employee employee = getEmployeeByUuid(UUID.fromString(uuid));
 
         employee.setFullName(request.getFullName());
         employee.setEmail(request.getEmail());
-        // Only update password if provided
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            employee.setPasswordHash(request.getPassword());
+            employee.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         }
         employee.setOffice(request.getOffice());
         employee.setRole(request.getRole());
         employee.setOnLeave(request.isOnLeave());
 
         employeeRepository.save(employee);
-
         return EmployeeResponseDTO.fromEntity(employee);
     }
 
     // ----------------------------
-    // Optional: delete an employee
+    // Delete employee
     // ----------------------------
     @Transactional
     public void deleteEmployee(String uuid) throws EmployeeNotFoundException {
-        Employee employee = employeeRepository.findByUuid(UUID.fromString(uuid))
-                .orElseThrow(EmployeeNotFoundException::new);
+        Employee employee = getEmployeeByUuid(UUID.fromString(uuid));
         employeeRepository.delete(employee);
     }
 }
