@@ -6,6 +6,7 @@ import com.clock_in.clock.model.Employee;
 import com.clock_in.clock.repository.EmployeeRepository;
 import com.clock_in.clock.service.ClockService;
 import com.clock_in.core.exceptions.AppGenericException;
+import com.clock_in.core.exceptions.EmployeeNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -84,12 +85,14 @@ public class ClockController {
     // Helper: find employee by UUID
     // ----------------------------
     private Employee findEmployeeByUuid(String uuid) throws AppGenericException {
-        // You likely have EmployeeRepository
-        return employeeRepository.findByUuid(java.util.UUID.fromString(uuid))
-                .orElseThrow(() -> new AppGenericException(
-                        "Employee not found",
-                        "EMPLOYEE_NOT_FOUND"
-                ));
+        java.util.UUID parsedUuid;
+        try {
+            parsedUuid = java.util.UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            throw new AppGenericException("Invalid UUID format: " + uuid, "INVALID_UUID");
+        }
+        return employeeRepository.findByUuid(parsedUuid)
+                .orElseThrow(EmployeeNotFoundException::new);
     }
 
 }
