@@ -2,14 +2,22 @@ package com.clock_in.clock.service;
 
 import com.clock_in.clock.dto.EmployeeRequestDTO;
 import com.clock_in.clock.dto.EmployeeResponseDTO;
+import com.clock_in.clock.dto.PagedEmployeeResponseDTO;
 import com.clock_in.clock.dto.auth.RegisterRequestDTO;
 import com.clock_in.clock.dto.auth.RegisterResponseDTO;
 import com.clock_in.clock.mapper.AuthMapper;
 import com.clock_in.clock.mapper.ClockMapper;
 import com.clock_in.clock.model.Employee;
 import com.clock_in.clock.repository.EmployeeRepository;
+import com.clock_in.clock.specification.EmployeeSpecification;
+import com.clock_in.core.enums.Role;
 import com.clock_in.core.exceptions.EmailAlreadyExists;
 import com.clock_in.core.exceptions.EmployeeNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +79,62 @@ public class EmployeeService {
                 .stream()
                 .map(EmployeeResponseDTO::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    // ----------------------------
+    // Search employees with pagination, search & filters
+    // ----------------------------
+    public PagedEmployeeResponseDTO searchEmployees(
+            String search,
+            String office,
+            String role,
+            Boolean onLeave,
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<Employee> spec = Specification.where(null);
+
+        if (search != null && !search.isBlank()) {
+            spec = spec.and(EmployeeSpecification.searchByKeyword(search.trim()));
+        }
+        if (office != null && !office.isBlank()) {
+            spec = spec.and(EmployeeSpecification.hasOffice(office));
+        }
+        if (role != null && !role.isBlank()) {
+            try {
+                Role roleEnum = Role.valueOf(role.toUpperCase());
+                spec = spec.and(EmployeeSpecification.hasRole(roleEnum));
+            } catch (IllegalArgumentException ignored) {
+                // Invalid role value, skip filter
+            }
+        }
+        if (onLeave != null) {
+            spec = spec.and(EmployeeSpecification.isOnLeave(onLeave));
+        }
+
+        Page<Employee> employeePage = employeeRepository.findAll(spec, pageable);
+
+        List<EmployeeResponseDTO> content = employeePage.getContent()
+                .stream()
+                .map(EmployeeResponseDTO::fromEntity)
+                .collect(Collectors.toList());
+
+        return PagedEmployeeResponseDTO.from(
+                content,
+                employeePage.getNumber(),
+                employeePage.getSize(),
+                employeePage.getTotalElements(),
+                employeePage.getTotalPages(),
+                employeePage.isLast()
+        );
     }
 
     // ----------------------------

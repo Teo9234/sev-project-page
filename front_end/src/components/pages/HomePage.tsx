@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { useAuth } from "../../context/authContextValue.ts";
+import { useAuth } from "@/context/authContextValue.ts";
 
 const HomePage = () => {
     const { isAuthenticated, user } = useAuth();

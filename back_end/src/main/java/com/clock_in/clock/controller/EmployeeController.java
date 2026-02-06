@@ -2,6 +2,7 @@ package com.clock_in.clock.controller;
 
 import com.clock_in.clock.dto.EmployeeRequestDTO;
 import com.clock_in.clock.dto.EmployeeResponseDTO;
+import com.clock_in.clock.dto.PagedEmployeeResponseDTO;
 import com.clock_in.clock.dto.auth.RegisterRequestDTO;
 import com.clock_in.clock.service.EmployeeService;
 import com.clock_in.clock.validator.ValidUUID;
@@ -9,6 +10,7 @@ import com.clock_in.core.exceptions.EmailAlreadyExists;
 import com.clock_in.core.exceptions.EmployeeNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +47,7 @@ public class EmployeeController {
     }
 
     // ----------------------------
-    // List all employees
+    // List all employees (legacy, no pagination)
     // GET /api/employees
     // ----------------------------
     @GetMapping
@@ -54,10 +56,29 @@ public class EmployeeController {
     }
 
     // ----------------------------
-    // Update employee
+    // Search employees with pagination, search & filters
+    // GET /api/employees/search?search=&office=&role=&onLeave=&page=0&size=10&sortBy=fullName&sortDir=asc
+    // ----------------------------
+    @GetMapping("/search")
+    public PagedEmployeeResponseDTO searchEmployees(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String office,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) Boolean onLeave,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "fullName") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        return employeeService.searchEmployees(search, office, role, onLeave, page, size, sortBy, sortDir);
+    }
+
+    // ----------------------------
+    // Update employee (MANAGER or SUPER_ADMIN only)
     // PUT /api/employees/{uuid}
     // ----------------------------
     @PutMapping("/{uuid}")
+    @PreAuthorize("hasAnyRole('MANAGER', 'SUPER_ADMIN')")
     public EmployeeResponseDTO updateEmployee(
             @ValidUUID @PathVariable String uuid,
             @Valid @RequestBody EmployeeRequestDTO request
@@ -66,11 +87,12 @@ public class EmployeeController {
     }
 
     // ----------------------------
-    // Delete employee
+    // Delete employee (MANAGER or SUPER_ADMIN only)
     // DELETE /api/employees/{uuid}
     // ----------------------------
     @DeleteMapping("/{uuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyRole('MANAGER', 'SUPER_ADMIN')")
     public void deleteEmployee(@PathVariable String uuid) throws EmployeeNotFoundException {
         employeeService.deleteEmployee(uuid);
     }
