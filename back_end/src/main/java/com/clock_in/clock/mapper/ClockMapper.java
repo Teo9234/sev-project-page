@@ -26,16 +26,6 @@ public class ClockMapper {
         return dto;
     }
 
-    public static Employee toEmployeeEntity(EmployeeRequestDTO dto) {
-        Employee employee = new Employee();
-        employee.setFullName(dto.getFullName());
-        employee.setEmail(dto.getEmail());
-        employee.setPassword(dto.getPassword()); // hash in service layer
-        employee.setRole(dto.getRole());
-        employee.setOffice(dto.getOffice());
-        employee.setOnLeave(dto.isOnLeave());
-        return employee;
-    }
 
     // -----------------------------
     // ClockEntry mappings

@@ -2,6 +2,9 @@ package com.clock_in.clock.service;
 
 import com.clock_in.clock.dto.EmployeeRequestDTO;
 import com.clock_in.clock.dto.EmployeeResponseDTO;
+import com.clock_in.clock.dto.auth.RegisterRequestDTO;
+import com.clock_in.clock.dto.auth.RegisterResponseDTO;
+import com.clock_in.clock.mapper.AuthMapper;
 import com.clock_in.clock.mapper.ClockMapper;
 import com.clock_in.clock.model.Employee;
 import com.clock_in.clock.repository.EmployeeRepository;
@@ -39,14 +42,14 @@ public class EmployeeService {
     // Create employee
     // ----------------------------
     @Transactional
-    public EmployeeResponseDTO createEmployee(EmployeeRequestDTO request) throws EmailAlreadyExists {
+    public EmployeeResponseDTO createEmployee(RegisterRequestDTO request) throws EmailAlreadyExists {
 
         if (employeeRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExists();
         }
 
-        Employee employee = ClockMapper.toEmployeeEntity(request);
-        employee.setPassword(passwordEncoder.encode(request.getPassword()));
+        Employee employee = AuthMapper.toEmployeeEntity(request);
+        employee.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
         employeeRepository.save(employee);
         return EmployeeResponseDTO.fromEntity(employee);
@@ -80,7 +83,7 @@ public class EmployeeService {
         employee.setFullName(request.getFullName());
         employee.setEmail(request.getEmail());
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            employee.setPassword(passwordEncoder.encode(request.getPassword()));
+            employee.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         }
         employee.setOffice(request.getOffice());
         employee.setRole(request.getRole());

@@ -4,50 +4,70 @@ import com.clock_in.clock.model.Employee;
 import com.clock_in.clock.repository.EmployeeRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
 public class JwtService {
 
-    private final String secret = System.getenv("JWT_SECRET_KEY");
-    private final long expirationMillis = 86400000; // 24 hours in milliseconds
+    @Value("${jwt.secret}")
+    private String secret;
+
+    @Value("${jwt.expiration}")
+    private long expirationMillis;
+
     private final EmployeeRepository employeeRepository;
 
     public JwtService(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
-    public String generateToken(Employee employee) {
-        Claims claims = Jwts.claims().setSubject(employee.getEmail());
-        claims.put("role", employee.getRole().name());
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
+    public String generateToken(Employee employee) {
         return Jwts.builder()
-                .setClaims(claims)
+                .setSubject(employee.getEmail())
+                .claim("role", employee.getRole().name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .signWith(getSigningKey())
                 .compact();
     }
 
     public boolean isTokenValid(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
+    public Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     public String extractEmail(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).getBody();
-        return claims.getSubject(); // Extracts the email from the token
+        return extractClaims(token).getSubject();
+    }
+
+    public String extractRole(String token) {
+        return extractClaims(token).get("role", String.class);
     }
 
     public Employee getEmployeeFromToken(String token) {
         String email = extractEmail(token);
-        return employeeRepository.findByEmail(email).orElse(null); // Fetch employee from DB
+        return employeeRepository.findByEmail(email).orElse(null);
     }
 }

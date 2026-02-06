@@ -7,7 +7,6 @@ import com.clock_in.clock.dto.auth.RegisterResponseDTO;
 import com.clock_in.clock.mapper.AuthMapper;
 import com.clock_in.clock.model.Employee;
 import com.clock_in.clock.repository.EmployeeRepository;
-import com.clock_in.core.exceptions.AppGenericException;
 import com.clock_in.core.exceptions.EmailAlreadyExists;
 import com.clock_in.core.exceptions.LoginFailed;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,7 +40,7 @@ public class AuthService {
         Employee employee = new Employee();
         employee.setFullName(request.getFullName());
         employee.setEmail(request.getEmail());
-        employee.setPassword(passwordEncoder.encode(request.getPassword()));
+        employee.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         employee.setOffice(request.getOffice());
         employee.setRole(request.getRole());
         employee.setOnLeave(request.isOnLeave());
@@ -60,9 +59,9 @@ public class AuthService {
         Employee employee = employeeRepository.findByEmail(request.getEmail())
                 .orElseThrow(LoginFailed::new);
 
-        System.out.println("HASH = " + employee.getPassword());
+        System.out.println("password = " + employee.getPasswordHash());
         System.out.println("ENCODER = " + passwordEncoder.getClass());
-        if (!passwordEncoder.matches(request.getPassword(), employee.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), employee.getPasswordHash())) {
             throw new LoginFailed();
         }
 

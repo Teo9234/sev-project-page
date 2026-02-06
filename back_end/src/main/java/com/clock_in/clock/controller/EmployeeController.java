@@ -2,6 +2,7 @@ package com.clock_in.clock.controller;
 
 import com.clock_in.clock.dto.EmployeeRequestDTO;
 import com.clock_in.clock.dto.EmployeeResponseDTO;
+import com.clock_in.clock.dto.auth.RegisterRequestDTO;
 import com.clock_in.clock.service.EmployeeService;
 import com.clock_in.clock.validator.ValidUUID;
 import com.clock_in.core.exceptions.EmailAlreadyExists;
@@ -28,7 +29,7 @@ public class EmployeeController {
     // ----------------------------
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EmployeeResponseDTO createEmployee(@Valid @RequestBody EmployeeRequestDTO request) throws EmailAlreadyExists {
+    public EmployeeResponseDTO createEmployee(@Valid @RequestBody RegisterRequestDTO request) throws EmailAlreadyExists {
         return employeeService.createEmployee(request);
     }
 
