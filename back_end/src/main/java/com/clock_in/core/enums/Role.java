@@ -2,6 +2,6 @@ package com.clock_in.core.enums;
 
 public enum Role {
     SUPER_ADMIN,
-    USER,
+    EMPLOYEE,
     MANAGER
 }

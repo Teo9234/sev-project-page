@@ -3,14 +3,17 @@ package com.clock_in.clock.dto.auth;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * DTO for login response, contains the generated JWT token and user details.
+ */
 @Getter
 @Setter
 public class LoginResponseDTO {
 
-    private String token;          // JWT token
-    private String fullName;
-    private String email;
-    private String role;      // use String if you call .name() on the enum
-    private String office;
-    private boolean onLeave;
+    private String token;  // The JWT token issued on successful login
+    private String fullName;  // The full name of the logged-in employee
+    private String email;  // The email of the logged-in employee
+    private String role;  // The role of the logged-in employee
+    private String office;  // The office of the logged-in employee
+    private boolean isOnLeave;  // Whether the employee is currently on leave
 }

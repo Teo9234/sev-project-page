@@ -3,10 +3,9 @@ package com.clock_in.clock.service;
 import com.clock_in.clock.dto.auth.LoginRequestDTO;
 import com.clock_in.clock.dto.auth.LoginResponseDTO;
 import com.clock_in.clock.dto.auth.RegisterRequestDTO;
-import com.clock_in.clock.dto.auth.RegisterResponseDTO;
-import com.clock_in.clock.mapper.AuthMapper;
 import com.clock_in.clock.model.Employee;
 import com.clock_in.clock.repository.EmployeeRepository;
+import com.clock_in.clock.service.JwtService;
 import com.clock_in.core.exceptions.AppGenericException;
 import com.clock_in.core.exceptions.EmailAlreadyExists;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,43 +26,41 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-    // -----------------------------
-    // Register
-    // -----------------------------
-    public RegisterResponseDTO register(RegisterRequestDTO request) throws AppGenericException {
+    // ----------------------------
+    // REGISTER
+    // ----------------------------
+    public Employee register(RegisterRequestDTO request) throws EmailAlreadyExists {
+
         if (employeeRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailAlreadyExists();
         }
 
+        Employee employee = new Employee();
+        employee.setFullName(request.getFullName());
+        employee.setEmail(request.getEmail());
+        employee.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        employee.setOffice(request.getOffice());
+        employee.setRole(request.getRole()); // Enum
+        employee.setOnLeave(false);
 
-
-        Employee employee = AuthMapper.toEmployeeEntity(request, passwordEncoder);
-        employeeRepository.save(employee);
-
-        return AuthMapper.toRegisterResponseDTO(employee);
+        return employeeRepository.save(employee);
     }
 
-    // -----------------------------
-    // Login
-    // -----------------------------
+    // ----------------------------
+    // LOGIN
+    // ----------------------------
     public LoginResponseDTO login(LoginRequestDTO request) throws AppGenericException {
+
         Employee employee = employeeRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppGenericException("Invalid email or password", "LOGIN_FAILED"));
 
-        if (!passwordEncoder.matches(request.getPassword(), employee.getPasswordHash())) {
+        boolean matches = passwordEncoder.matches(request.getPassword(), employee.getPasswordHash());
+        if (!matches) {
             throw new AppGenericException("Invalid email or password", "LOGIN_FAILED");
         }
 
         String token = jwtService.generateToken(employee);
 
-        LoginResponseDTO response = new LoginResponseDTO();
-        response.setToken(token);
-        response.setFullName(employee.getFullName());
-        response.setEmail(employee.getEmail());
-        response.setRole(employee.getRole().name());
-        response.setOffice(employee.getOffice());
-        response.setOnLeave(employee.isOnLeave());
-
-        return response;
+        return new LoginResponseDTO(employee.getUuid(), employee.getEmail(), employee.getFullName(), token);
     }
 }
