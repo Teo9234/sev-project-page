@@ -25,6 +25,9 @@ public interface ClockEntryRepository extends JpaRepository<ClockEntry, Long> {
     // Find all clock entries within a specific time range (used for reporting, admin functions)
     List<ClockEntry> findByClockInTimeBetween(LocalDateTime start, LocalDateTime end);
 
+    // Find the most recent completed clock entry for a specific employee (used for last clock-out display)
+    Optional<ClockEntry> findFirstByEmployeeAndClockOutTimeIsNotNullOrderByClockOutTimeDesc(Employee employee);
+
     // Find by UUID (used for API endpoints, internal logic)
     Optional<ClockEntry> findByUuid(UUID uuid);
 

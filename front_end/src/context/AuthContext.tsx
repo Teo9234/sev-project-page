@@ -5,12 +5,13 @@ import { AuthContext } from "./authContextValue.ts";
 
 function getInitialAuth(): { isAuthenticated: boolean; user: AuthUser | null } {
     const token = getCookie("token");
+    const uuid = getCookie("uuid");
     const fullName = getCookie("fullName");
     const email = getCookie("email");
     const role = getCookie("role");
 
-    if (token && fullName && email && role) {
-        return { isAuthenticated: true, user: { fullName, email, role } };
+    if (token && uuid && fullName && email && role) {
+        return { isAuthenticated: true, user: { uuid, fullName, email, role } };
     }
     return { isAuthenticated: false, user: null };
 }
@@ -20,17 +21,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(initial.isAuthenticated);
     const [user, setUser] = useState<AuthUser | null>(initial.user);
 
-    const loginUser = (token: string, fullName: string, email: string, role: string) => {
+    const loginUser = (token: string, uuid: string, fullName: string, email: string, role: string) => {
         setCookie("token", token, { expires: 1, sameSite: "strict" });
+        setCookie("uuid", uuid, { expires: 1, sameSite: "strict" });
         setCookie("fullName", fullName, { expires: 1, sameSite: "strict" });
         setCookie("email", email, { expires: 1, sameSite: "strict" });
         setCookie("role", role, { expires: 1, sameSite: "strict" });
         setIsAuthenticated(true);
-        setUser({ fullName, email, role });
+        setUser({ uuid, fullName, email, role });
     };
 
     const logoutUser = () => {
         deleteCookie("token");
+        deleteCookie("uuid");
         deleteCookie("fullName");
         deleteCookie("email");
         deleteCookie("role");

@@ -1,6 +1,7 @@
 package com.clock_in.clock.controller;
 
 import com.clock_in.clock.dto.ClockEntryResponseDTO;
+import com.clock_in.clock.dto.ClockStatusResponseDTO;
 import com.clock_in.clock.model.Employee;
 import com.clock_in.clock.repository.EmployeeRepository;
 import com.clock_in.clock.service.ClockService;
@@ -22,6 +23,19 @@ public class ClockController {
     public ClockController(ClockService clockService, EmployeeRepository employeeRepository) {
         this.clockService = clockService;
         this.employeeRepository = employeeRepository;
+    }
+
+    /**
+     * Get the current clock status for an employee
+     * GET /api/clock/status?employeeUuid=...
+     */
+    @GetMapping("/status")
+    public ResponseEntity<ClockStatusResponseDTO> getStatus(
+            @RequestParam String employeeUuid
+    ) throws AppGenericException {
+        Employee employee = findEmployeeByUuid(employeeUuid);
+        ClockStatusResponseDTO response = clockService.getStatus(employee);
+        return ResponseEntity.ok(response);
     }
 
     /**

@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 
 export type AuthUser = {
     fullName: string;
+    uuid: string;
     email: string;
     role: string;
 };
@@ -9,7 +10,7 @@ export type AuthUser = {
 export type AuthContextType = {
     isAuthenticated: boolean;
     user: AuthUser | null;
-    loginUser: (token: string, fullName: string, email: string, role: string) => void;
+    loginUser: (token: string, uuid:string, fullName: string, email: string, role: string) => void;
     logoutUser: () => void;
 };
 

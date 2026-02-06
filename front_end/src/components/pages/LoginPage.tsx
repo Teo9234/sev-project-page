@@ -4,16 +4,17 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { login } from "@/api/login.ts";
 import { loginSchema, type LoginFields } from "@/schemas/login.ts";
-import { setCookie } from "@/utils/cookies.ts";
 import { Button } from "../ui/button.tsx";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card.tsx";
 import { Input } from "../ui/input.tsx";
 import { Label } from "../ui/label.tsx";
+import {useAuth} from "@/context/authContextValue.ts";
 
 const LoginPage = () => {
     const [serverError, setServerError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const { loginUser } = useAuth();
 
     const {
         register,
@@ -32,10 +33,7 @@ const LoginPage = () => {
         setIsLoading(true);
         try {
             const response = await login(data);
-            setCookie("token", response.token, { expires: 1, sameSite: "strict" });
-            setCookie("fullName", response.fullName, { expires: 1, sameSite: "strict" });
-            setCookie("email", response.email, { expires: 1, sameSite: "strict" });
-            setCookie("role", response.role, { expires: 1, sameSite: "strict" });
+            loginUser(response.token, response.uuid, response.fullName, response.email, response.role);
             navigate("/");
         } catch (error) {
             if (error instanceof Error) {

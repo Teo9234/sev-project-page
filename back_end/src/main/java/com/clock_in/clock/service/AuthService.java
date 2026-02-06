@@ -69,6 +69,7 @@ public class AuthService {
 
         LoginResponseDTO response = new LoginResponseDTO();
         response.setToken(token);
+        response.setUuid(employee.getUuid().toString());
         response.setFullName(employee.getFullName());
         response.setEmail(employee.getEmail());
         response.setRole(employee.getRole().name());

@@ -3,6 +3,7 @@ import type { LoginFields, RegisterFields } from "@/schemas/login.ts";
 const API_URL = "http://localhost:8080/api";
 
 export type LoginResponse = {
+    uuid: string;
     token: string;
     fullName: string;
     email: string;
