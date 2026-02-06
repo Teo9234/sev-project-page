@@ -1,4 +1,5 @@
 import type { LoginFields, RegisterFields } from "@/schemas/login.ts";
+import {getCookie} from "@/utils/cookies.ts";
 
 const API_URL = "http://localhost:8080/api";
 
@@ -82,4 +83,16 @@ export async function register(fields: RegisterFields): Promise<RegisterResponse
         throw new Error(detail);
     }
     return await response.json();
+
+}
+
+export async function logout(): Promise<void> {
+    const token = getCookie("token");
+    await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+    });
 }

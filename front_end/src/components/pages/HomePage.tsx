@@ -12,7 +12,6 @@ const HomePage = () => {
     const authenticatedLinks = [
         { path: "/clock", label: "Clock in Page" },
         { path: "/employees", label: "Employee List" },
-        { path: "/profile", label: "User Profile" }
     ];
 
     const links = isAuthenticated ? authenticatedLinks : publicLinks;

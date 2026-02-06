@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { logout as logoutApi } from "../api/login.ts";
 import { deleteCookie, getCookie, setCookie } from "../utils/cookies.ts";
 import type { AuthUser } from "./authContextValue.ts";
 import { AuthContext } from "./authContextValue.ts";
@@ -31,7 +32,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser({ uuid, fullName, email, role });
     };
 
-    const logoutUser = () => {
+    const logoutUser = async () => {
+        try {
+            await logoutApi();
+        } catch (error) {
+            console.error("Logout API call failed:", error);
+        }
         deleteCookie("token");
         deleteCookie("uuid");
         deleteCookie("fullName");

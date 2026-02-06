@@ -78,4 +78,11 @@ public class AuthService {
 
         return response;
     }
+
+    /**
+     * Logout by invalidating the current JWT token.
+     */
+    public void logout(String token) {
+        jwtService.invalidateToken(token);
+    }
 }

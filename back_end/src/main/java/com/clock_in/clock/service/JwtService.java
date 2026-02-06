@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class JwtService {
@@ -27,6 +29,8 @@ public class JwtService {
         this.employeeRepository = employeeRepository;
     }
 
+    private final Set<String> blacklistedTokens = ConcurrentHashMap.newKeySet();
+
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
@@ -41,8 +45,26 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * Invalidate a token by adding it to the blacklist.
+     */
+    public void invalidateToken(String token) {
+        blacklistedTokens.add(token);
+    }
+
+    /**
+     * Check if a token has been blacklisted (logged out).
+     */
+    public boolean isTokenBlacklisted(String token) {
+        return blacklistedTokens.contains(token);
+    }
+
     public boolean isTokenValid(String token) {
         try {
+            // temporary approach to invalidate tokens: check blacklist first, then validate signature and expiration
+            if (isTokenBlacklisted(token)) {
+                return false;
+            }
             Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
             return true;
         } catch (Exception e) {
