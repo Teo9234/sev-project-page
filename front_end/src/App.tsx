@@ -9,6 +9,7 @@ import LoginPage from "./components/pages/LoginPage.tsx";
 import PageNotFound from "./components/pages/PageNotFound.tsx";
 import RegisterPage from "./components/pages/RegisterPage.tsx";
 import {AuthProvider} from "@/context/AuthContext.tsx";
+import EditEmployeePage from "@/components/pages/EditEmployeePage.tsx";
 
 function App() {
 
@@ -24,13 +25,13 @@ function App() {
                     <Route element={<RouterLayout />}>
                         {/*Login page place for later*/}
                         <Route path="/" element={<HomePage />} />
-
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/register" element={<RegisterPage />} />
                         <Route path="/clock" element={<ClockInPage />} />
                         <Route path={"/clock-in"} element={<ClockInPage />} />
                         <Route path={"/employees"}>
                             <Route index element={<EmployeeListPage />} />
+                            <Route path=":uuid" element={<EditEmployeePage />} />
                         </Route>
 
                         <Route path="*" element={<PageNotFound />} />
