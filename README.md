@@ -1,6 +1,6 @@
 # Clock-In System — A Full-Stack Project
 
-This is a full-stack web app, that allows employees to clock in or out. It  includes a JWT authentication system. Built using Spring Boot for the back end and React + Vite for the back end.
+This is a full-stack web app, that allows employees to clock in or out. It  includes a JWT authentication system. Built using Spring Boot for the back end and React + Vite for the front end.
 
 ---
 
